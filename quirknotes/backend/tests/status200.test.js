@@ -127,6 +127,9 @@ test("/deleteNote - Delete a note", async () => {
   expect(deleteNoteBody.response).toBe(
     `Document with ID ${postNoteBody.insertedId} deleted.`
   );
+
+  const { getAllNotesBody } = await getAllNotesHelper();
+  expect(getAllNotesBody.response.length).toBe(0);
 });
 
 test("/patchNote - Patch with content and title", async () => {
@@ -226,6 +229,9 @@ test("/deleteAllNotes - Delete one note", async () => {
   expect(deleteAllNotesBody.response).toBe(
     `${1} note(s) deleted.`
   );
+
+  const { getAllNotesBody } = await getAllNotesHelper();
+  expect(getAllNotesBody.response.length).toBe(0);
 });
 
 test("/deleteAllNotes - Delete three notes", async () => {
@@ -239,6 +245,9 @@ test("/deleteAllNotes - Delete three notes", async () => {
   expect(deleteAllNotesBody.response).toBe(
     `${3} note(s) deleted.`
   );
+
+  const { getAllNotesBody } = await getAllNotesHelper();
+  expect(getAllNotesBody.response.length).toBe(0);
 });
 
 test("/updateNoteColor - Update color of a note to red (#FF0000)", async () => {
