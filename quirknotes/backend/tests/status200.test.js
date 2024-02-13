@@ -3,7 +3,7 @@ test("1+2=3, empty array is empty", () => {
     expect([].length).toBe(0);
   });
 
-const SERVER_URL = "http://localhost:27017";
+const SERVER_URL = "http://localhost:4000";
 
 test("/postNote - Post a note", async () => {
     const title = "NoteTitleTest";
