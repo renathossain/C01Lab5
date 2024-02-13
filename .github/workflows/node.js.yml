@@ -17,8 +17,7 @@
           
           steps:
               - uses: actions/checkout@v3
-              - name: Set up MongoDB
-                uses: supercharge/mongodb-github-action@v0.1.0
+              - uses: supercharge/mongodb-github-action@v0.1.0
               - run: mkdir -p .datadb
               - run: mongod --dbpath=.datadb
 
@@ -30,16 +29,11 @@
               run:
                   working-directory: ./quirknotes/backend
 
-          strategy:
-              matrix:
-                  node-version: [20.x]
-
           steps:
               - uses: actions/checkout@v3
 
-              - name: Use Node.js ${{ matrix.node-version }}
-                uses: actions/setup-node@v3
+              - uses: actions/setup-node@v3
                 with:
-                  node-version: ${{ matrix.node-version }}
+                  node-version: 20.x
               - run: npm i
               - run: npm run dev
