@@ -29,12 +29,36 @@ async function deleteNoteHelper(noteId) {
 
 async function getAllNotesHelper() {
   const getAllNotesRes = await fetch(`${SERVER_URL}/getAllNotes`, {
-    method: "GET"
+    method: "GET",
   });
 
   const getAllNotesBody = await getAllNotesRes.json();
 
   return { getAllNotesRes, getAllNotesBody };
+}
+
+async function patchNoteHelper(noteId, jsonBody) {
+  const patchNoteRes = await fetch(`${SERVER_URL}/patchNote/${noteId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(jsonBody),
+  });
+
+  const patchNoteBody = await patchNoteRes.json();
+
+  return { patchNoteRes, patchNoteBody };
+}
+
+async function deleteAllNotesHelper() {
+  const deleteAllNotesRes = await fetch(`${SERVER_URL}/deleteAllNotes`, {
+    method: "DELETE",
+  });
+
+  const deleteAllNotesBody = await deleteAllNotesRes.json();
+
+  return { deleteAllNotesRes, deleteAllNotesBody };
 }
 
 test("/postNote - Post a note", async () => {
@@ -75,33 +99,130 @@ test("/getAllNotes - Return list of two notes for getAllNotes", async () => {
 });
 
 test("/deleteNote - Delete a note", async () => {
-  // Code here
-  expect(false).toBe(true);
+  const { postNoteBody } = await postNoteHelper(
+    "NoteTitleTest", "NoteTitleContent"
+  );
+
+  const { deleteNoteRes, deleteNoteBody } = await deleteNoteHelper(
+    postNoteBody.insertedId
+  );
+
+  expect(deleteNoteRes.status).toBe(200);
+  expect(deleteNoteBody.response).toBe(
+    `Document with ID ${postNoteBody.insertedId} deleted.`
+  );
 });
 
 test("/patchNote - Patch with content and title", async () => {
-  // Code here
-  expect(false).toBe(true);
+  const { postNoteBody } = await postNoteHelper(
+    "NoteTitleTest", "NoteTitleContent"
+  );
+
+  const { patchNoteRes, patchNoteBody } = await patchNoteHelper(
+    postNoteBody.insertedId,
+    {
+      title: "NewTitleTest",
+      content: "NewTitleContent",
+    }
+  );
+
+  expect(patchNoteRes.status).toBe(200);
+  expect(patchNoteBody.response).toBe(
+    `Document with ID ${postNoteBody.insertedId} patched.`
+  );
+
+  const { getAllNotesBody } = await getAllNotesHelper();
+  const patchedNote = getAllNotesBody.response.find(
+    note => note._id === postNoteBody.insertedId
+  );
+
+  expect(patchedNote.title).toBe("NewTitleTest");
+  expect(patchedNote.content).toBe("NewTitleContent");
+
+  // Cleanup
+  deleteNoteHelper(postNoteBody.insertedId);
 });
 
 test("/patchNote - Patch with just title", async () => {
-  // Code here
-  expect(false).toBe(true);
+  const { postNoteBody } = await postNoteHelper(
+    "NoteTitleTest", "NoteTitleContent"
+  );
+
+  const { patchNoteRes, patchNoteBody } = await patchNoteHelper(
+    postNoteBody.insertedId,
+    {
+      title: "NewTitleTest",
+    }
+  );
+
+  expect(patchNoteRes.status).toBe(200);
+  expect(patchNoteBody.response).toBe(
+    `Document with ID ${postNoteBody.insertedId} patched.`
+  );
+
+  const { getAllNotesBody } = await getAllNotesHelper();
+  const patchedNote = getAllNotesBody.response.find(
+    note => note._id === postNoteBody.insertedId
+  );
+
+  expect(patchedNote.title).toBe("NewTitleTest");
+  expect(patchedNote.content).toBe("NoteTitleContent");
+
+  // Cleanup
+  deleteNoteHelper(postNoteBody.insertedId);
 });
 
 test("/patchNote - Patch with just content", async () => {
-  // Code here
-  expect(false).toBe(true);
+  const { postNoteBody } = await postNoteHelper(
+    "NoteTitleTest", "NoteTitleContent"
+  );
+
+  const { patchNoteRes, patchNoteBody } = await patchNoteHelper(
+    postNoteBody.insertedId,
+    {
+      content: "NewTitleContent",
+    }
+  );
+
+  expect(patchNoteRes.status).toBe(200);
+  expect(patchNoteBody.response).toBe(
+    `Document with ID ${postNoteBody.insertedId} patched.`
+  );
+
+  const { getAllNotesBody } = await getAllNotesHelper();
+  const patchedNote = getAllNotesBody.response.find(
+    note => note._id === postNoteBody.insertedId
+  );
+
+  expect(patchedNote.title).toBe("NoteTitleTest");
+  expect(patchedNote.content).toBe("NewTitleContent");
+
+  // Cleanup
+  deleteNoteHelper(postNoteBody.insertedId);
 });
 
 test("/deleteAllNotes - Delete one note", async () => {
-  // Code here
-  expect(false).toBe(true);
+  await postNoteHelper( "NoteTitleTest", "NoteTitleContent" );
+
+  const { deleteAllNotesRes, deleteAllNotesBody } = await deleteAllNotesHelper();
+
+  expect(deleteAllNotesRes.status).toBe(200);
+  expect(deleteAllNotesBody.response).toBe(
+    `${1} note(s) deleted.`
+  );
 });
 
 test("/deleteAllNotes - Delete three notes", async () => {
-  // Code here
-  expect(false).toBe(true);
+  await postNoteHelper( "NoteTitleTest1", "NoteTitleContent1" );
+  await postNoteHelper( "NoteTitleTest2", "NoteTitleContent2" );
+  await postNoteHelper( "NoteTitleTest3", "NoteTitleContent3" );
+
+  const { deleteAllNotesRes, deleteAllNotesBody } = await deleteAllNotesHelper();
+
+  expect(deleteAllNotesRes.status).toBe(200);
+  expect(deleteAllNotesBody.response).toBe(
+    `${3} note(s) deleted.`
+  );
 });
 
 test("/updateNoteColor - Update color of a note to red (#FF0000)", async () => {
