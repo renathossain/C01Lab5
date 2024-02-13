@@ -17,6 +17,8 @@
           
           steps:
               - uses: actions/checkout@v3
+              - name: Set up MongoDB
+                uses: supercharge/mongodb-github-action@v0.1.0
               - run: mkdir -p .datadb
               - run: mongod --dbpath=.datadb
 
