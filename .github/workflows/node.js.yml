@@ -10,7 +10,6 @@
       build:
           name: Backend test
           runs-on: ubuntu-latest
-          options: --detach
 
           defaults:
               run:
