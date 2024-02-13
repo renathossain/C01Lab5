@@ -61,6 +61,22 @@ async function deleteAllNotesHelper() {
   return { deleteAllNotesRes, deleteAllNotesBody };
 }
 
+async function updateNoteColorHelper(noteId, color) {
+  const updateNoteColorRes = await fetch(`${SERVER_URL}/updateNoteColor/${noteId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      color: color,
+    }),
+  });
+
+  const updateNoteColorBody = await updateNoteColorRes.json();
+
+  return { updateNoteColorRes, updateNoteColorBody };
+}
+
 test("/postNote - Post a note", async () => {
   const { postNoteRes, postNoteBody } = await postNoteHelper(
     "NoteTitleTest", "NoteTitleContent"
@@ -226,6 +242,26 @@ test("/deleteAllNotes - Delete three notes", async () => {
 });
 
 test("/updateNoteColor - Update color of a note to red (#FF0000)", async () => {
-  // Code here
-  expect(false).toBe(true);
+  const { postNoteBody } = await postNoteHelper(
+    "NoteTitleTest", "NoteTitleContent"
+  );
+
+  const { updateNoteColorRes, updateNoteColorBody } = await updateNoteColorHelper(
+    postNoteBody.insertedId, "#FF0000"
+  );
+
+  expect(updateNoteColorRes.status).toBe(200);
+  expect(updateNoteColorBody.message).toBe(
+    `Note color updated successfully.`
+  );
+
+  const { getAllNotesBody } = await getAllNotesHelper();
+  const patchedNote = getAllNotesBody.response.find(
+    note => note._id === postNoteBody.insertedId
+  );
+
+  expect(patchedNote.color).toBe("#FF0000");
+
+  // Cleanup
+  deleteNoteHelper(postNoteBody.insertedId);
 });
